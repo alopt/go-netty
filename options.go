@@ -20,7 +20,7 @@ import (
 	"context"
 	"sync/atomic"
 
-	"github.com/go-netty/go-netty/transport"
+	"github.com/alopt/go-netty/transport"
 )
 
 type (

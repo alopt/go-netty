@@ -25,9 +25,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-netty/go-netty/transport"
-	"github.com/go-netty/go-netty/transport/tcp"
-	"github.com/go-netty/go-netty/utils"
+	"github.com/alopt/go-netty/transport"
+	"github.com/alopt/go-netty/transport/tcp"
+	"github.com/alopt/go-netty/utils"
 )
 
 func TestBootstrap(t *testing.T) {

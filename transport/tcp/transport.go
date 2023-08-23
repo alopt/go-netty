@@ -19,7 +19,7 @@ package tcp
 import (
 	"net"
 
-	"github.com/go-netty/go-netty/transport"
+	"github.com/alopt/go-netty/transport"
 )
 
 type tcpTransport struct {

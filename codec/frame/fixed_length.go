@@ -19,9 +19,9 @@ package frame
 import (
 	"io"
 
-	"github.com/go-netty/go-netty"
-	"github.com/go-netty/go-netty/codec"
-	"github.com/go-netty/go-netty/utils"
+	"github.com/alopt/go-netty"
+	"github.com/alopt/go-netty/codec"
+	"github.com/alopt/go-netty/utils"
 )
 
 // FixedLengthCodec create fixed length codec

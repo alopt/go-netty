@@ -21,7 +21,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/go-netty/go-netty/transport"
+	"github.com/alopt/go-netty/transport"
 )
 
 // New tcp factory

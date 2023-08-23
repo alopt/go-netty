@@ -20,8 +20,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/go-netty/go-netty"
-	"github.com/go-netty/go-netty/utils"
+	"github.com/alopt/go-netty"
+	"github.com/alopt/go-netty/utils"
 	"testing"
 )
 

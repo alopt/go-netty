@@ -16,7 +16,7 @@
 
 package frame
 
-import "github.com/go-netty/go-netty"
+import "github.com/alopt/go-netty"
 
 // MockHandlerContext for mock handler context
 type MockHandlerContext struct {

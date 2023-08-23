@@ -1,3 +1,3 @@
-module github.com/go-netty/go-netty
+module github.com/alopt/go-netty
 
 go 1.16

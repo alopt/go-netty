@@ -22,8 +22,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-netty/go-netty"
-	"github.com/go-netty/go-netty/utils"
+	"github.com/alopt/go-netty"
+	"github.com/alopt/go-netty/utils"
 )
 
 type responseCodec struct {

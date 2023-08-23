@@ -18,8 +18,9 @@ package frame
 
 import (
 	"encoding/binary"
-	"github.com/go-netty/go-netty"
-	"github.com/go-netty/go-netty/utils"
+
+	"github.com/alopt/go-netty"
+	"github.com/alopt/go-netty/utils"
 )
 
 // LengthFieldPrepender for LengthFieldCodec
@@ -30,6 +31,7 @@ func LengthFieldPrepender(
 	lengthFieldLength int,
 	lengthAdjustment int,
 	lengthIncludesLengthFieldLength bool,
+	addLengthField bool,
 ) netty.OutboundHandler {
 	utils.AssertIf(lengthFieldLength != 1 && lengthFieldLength != 2 &&
 		lengthFieldLength != 4 && lengthFieldLength != 8, "lengthFieldLength must be either 1, 2, 3, 4, or 8")
@@ -38,6 +40,7 @@ func LengthFieldPrepender(
 		lengthFieldLength:               lengthFieldLength,
 		lengthAdjustment:                lengthAdjustment,
 		lengthIncludesLengthFieldLength: lengthIncludesLengthFieldLength,
+		addLengthField:                  addLengthField,
 	}
 }
 
@@ -46,20 +49,24 @@ type lengthFieldPrepender struct {
 	lengthFieldLength               int
 	lengthAdjustment                int
 	lengthIncludesLengthFieldLength bool
+	addLengthField                  bool
 }
 
 func (l *lengthFieldPrepender) HandleWrite(ctx netty.OutboundContext, message netty.Message) {
-
 	bodyBytes := utils.MustToBytes(message)
+	if l.addLengthField {
+		length := len(bodyBytes) + l.lengthAdjustment
+		if l.lengthIncludesLengthFieldLength {
+			length += l.lengthFieldLength
+		}
 
-	length := len(bodyBytes) + l.lengthAdjustment
-	if l.lengthIncludesLengthFieldLength {
-		length += l.lengthFieldLength
+		// 头部长度字段
+		lengthBuff := packFieldLength(l.byteOrder, l.lengthFieldLength, int64(length))
+
+		// HEAD | BODY
+		ctx.HandleWrite([][]byte{lengthBuff, bodyBytes})
+	} else {
+		// 仅发送消息内容
+		ctx.HandleWrite([][]byte{bodyBytes})
 	}
-
-	// head buffer
-	lengthBuff := packFieldLength(l.byteOrder, l.lengthFieldLength, int64(length))
-
-	// HEAD | BODY
-	ctx.HandleWrite([][]byte{lengthBuff, bodyBytes})
 }

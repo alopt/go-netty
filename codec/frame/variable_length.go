@@ -17,9 +17,9 @@
 package frame
 
 import (
-	"github.com/go-netty/go-netty"
-	"github.com/go-netty/go-netty/codec"
-	"github.com/go-netty/go-netty/utils"
+	"github.com/alopt/go-netty"
+	"github.com/alopt/go-netty/codec"
+	"github.com/alopt/go-netty/utils"
 )
 
 // VariableLengthCodec create maximum received length codec

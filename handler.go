@@ -25,7 +25,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/go-netty/go-netty/utils"
+	"github.com/alopt/go-netty/utils"
 )
 
 type (

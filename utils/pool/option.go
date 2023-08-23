@@ -1,6 +1,6 @@
 package pool
 
-import "github.com/go-netty/go-netty/utils/pool/internal/pmath"
+import "github.com/alopt/go-netty/utils/pool/internal/pmath"
 
 // Option configures pool.
 type Option func(Config)
