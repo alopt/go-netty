@@ -19,10 +19,11 @@ package format
 import (
 	"bytes"
 	"fmt"
-	"github.com/alopt/go-netty"
-	"github.com/alopt/go-netty/utils"
 	"strings"
 	"testing"
+
+	"github.com/alopt/go-netty"
+	"github.com/alopt/go-netty/utils"
 )
 
 func TestTextCodec(t *testing.T) {

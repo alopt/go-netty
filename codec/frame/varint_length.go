@@ -18,10 +18,11 @@ package frame
 
 import (
 	"encoding/binary"
+	"io"
+
 	"github.com/alopt/go-netty"
 	"github.com/alopt/go-netty/codec"
 	"github.com/alopt/go-netty/utils"
-	"io"
 )
 
 // VarintLengthFieldCodec create varint length field based codec

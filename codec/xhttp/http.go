@@ -18,8 +18,9 @@ package xhttp
 
 import (
 	"fmt"
-	"github.com/alopt/go-netty/utils"
 	"net/http"
+
+	"github.com/alopt/go-netty/utils"
 
 	"github.com/alopt/go-netty"
 	"github.com/alopt/go-netty/codec"

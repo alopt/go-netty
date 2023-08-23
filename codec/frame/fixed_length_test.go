@@ -19,9 +19,10 @@ package frame
 import (
 	"bytes"
 	"fmt"
-	"github.com/alopt/go-netty/utils"
 	"strings"
 	"testing"
+
+	"github.com/alopt/go-netty/utils"
 
 	"github.com/alopt/go-netty"
 )

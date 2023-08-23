@@ -18,6 +18,7 @@ package format
 
 import (
 	"encoding/json"
+
 	"github.com/alopt/go-netty"
 	"github.com/alopt/go-netty/codec"
 	"github.com/alopt/go-netty/utils"

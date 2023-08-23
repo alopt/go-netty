@@ -17,8 +17,9 @@
 package format
 
 import (
-	"github.com/alopt/go-netty/utils"
 	"strings"
+
+	"github.com/alopt/go-netty/utils"
 
 	"github.com/alopt/go-netty"
 	"github.com/alopt/go-netty/codec"

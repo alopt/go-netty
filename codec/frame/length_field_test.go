@@ -19,8 +19,9 @@ package frame
 import (
 	"bytes"
 	"encoding/binary"
-	"github.com/alopt/go-netty/utils"
 	"testing"
+
+	"github.com/alopt/go-netty/utils"
 
 	"github.com/alopt/go-netty"
 )

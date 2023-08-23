@@ -52,7 +52,7 @@ func LengthFieldCodec(
 		lengthFieldLength:   lengthFieldLength,
 		lengthAdjustment:    lengthAdjustment,
 		initialBytesToStrip: initialBytesToStrip,
-		OutboundHandler:     LengthFieldPrepender(byteOrder, lengthFieldLength, 0, false),
+		OutboundHandler:     LengthFieldPrepender(byteOrder, lengthFieldLength, 0, false, false),
 	}
 }
 
