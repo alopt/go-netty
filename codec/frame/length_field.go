@@ -36,6 +36,7 @@ func LengthFieldCodec(
 	lengthFieldLength int, // 记录该帧数据长度的字段本身的长度 1, 2, 4, 8
 	lengthAdjustment int, // 包体长度调整的大小，长度域的数值表示的长度加上这个修正值表示的就是带header的包长度
 	initialBytesToStrip int, // 拿到一个完整的数据包之后向业务解码器传递之前，应该跳过多少字节
+	prefixField []byte, // 前导域/前缀字节
 ) codec.Codec {
 	utils.AssertIf(maxFrameLength <= 0, "maxFrameLength must be a positive integer")
 	utils.AssertIf(lengthFieldOffset < 0, "lengthFieldOffset must be a non-negative integer")
@@ -53,6 +54,7 @@ func LengthFieldCodec(
 		lengthAdjustment:    lengthAdjustment,
 		initialBytesToStrip: initialBytesToStrip,
 		OutboundHandler:     LengthFieldPrepender(byteOrder, lengthFieldLength, 0, false, false),
+		prefixField:         prefixField,
 	}
 }
 
@@ -63,6 +65,7 @@ type lengthFieldCodec struct {
 	lengthFieldLength   int
 	lengthAdjustment    int
 	initialBytesToStrip int
+	prefixField         []byte
 
 	// default encoder
 	netty.OutboundHandler
@@ -84,6 +87,28 @@ func (l *lengthFieldCodec) HandleRead(ctx netty.InboundContext, message netty.Me
 	n, err := io.ReadFull(reader, headerBuffer)
 
 	utils.AssertIf(n != len(headerBuffer) || nil != err, "read header fail, headerLength: %d, read: %d, error: %w", len(headerBuffer), n, err)
+
+	// Find the indexes of 0xfa and 0xaf
+	index := l.findIndexes(headerBuffer)
+
+	// If both indexes are found, discard the bytes before them
+	if index >= 0 {
+		bytesRead := 0
+		buffer := make([]byte, index)
+		bytesRead, err = reader.Read(buffer)
+		if bytesRead < index {
+			fmt.Println("bytesRead < index1:", bytesRead, index)
+			return
+		}
+		if err != nil {
+			// 处理读取错误的情况
+			return
+		}
+		// 滑动headerBuffer字节数组,删除多少字节,滑动多少
+		headerBuffer = append(headerBuffer[index:], buffer...)
+	} else {
+		return
+	}
 
 	lengthFieldBuff := headerBuffer[l.lengthFieldOffset:lengthFieldEndOffset]
 
@@ -116,6 +141,29 @@ func (l *lengthFieldCodec) HandleRead(ctx netty.InboundContext, message netty.Me
 	}
 
 	ctx.HandleRead(frameReader)
+}
+
+func (l *lengthFieldCodec) findIndexes(data []byte) int {
+	index := -1
+	lengthPrefixField := len(l.prefixField)
+
+	// Slide the window over the data
+	for i := 0; i < len(data)-lengthPrefixField+1; i++ {
+		// Check if the current window matches the pattern
+		matches := true
+		for j := 0; j < lengthPrefixField; j++ {
+			if data[i+j] != l.prefixField[j] {
+				matches = false
+				break
+			}
+		}
+
+		if matches {
+			index = i
+			break
+		}
+	}
+	return index
 }
 
 func unpackFieldLength(byteOrder binary.ByteOrder, fieldLen int, buff []byte) (frameLength int64) {
