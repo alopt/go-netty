@@ -36,7 +36,7 @@ func LengthFieldCodec(
 	lengthFieldLength int, // 记录该帧数据长度的字段本身的长度 1, 2, 4, 8
 	lengthAdjustment int, // 包体长度调整的大小，长度域的数值表示的长度加上这个修正值表示的就是带header的包长度
 	initialBytesToStrip int, // 拿到一个完整的数据包之后向业务解码器传递之前，应该跳过多少字节
-	prefixField []byte, // 前导域/前缀字节
+	prefixFields [][]byte, // 前导域/前缀字节
 ) codec.Codec {
 	utils.AssertIf(maxFrameLength <= 0, "maxFrameLength must be a positive integer")
 	utils.AssertIf(lengthFieldOffset < 0, "lengthFieldOffset must be a non-negative integer")
@@ -54,7 +54,7 @@ func LengthFieldCodec(
 		lengthAdjustment:    lengthAdjustment,
 		initialBytesToStrip: initialBytesToStrip,
 		OutboundHandler:     LengthFieldPrepender(byteOrder, lengthFieldLength, 0, false, false),
-		prefixField:         prefixField,
+		prefixFields:        prefixFields,
 	}
 }
 
@@ -65,7 +65,7 @@ type lengthFieldCodec struct {
 	lengthFieldLength   int
 	lengthAdjustment    int
 	initialBytesToStrip int
-	prefixField         []byte
+	prefixFields        [][]byte
 
 	// default encoder
 	netty.OutboundHandler
@@ -89,7 +89,7 @@ func (l *lengthFieldCodec) HandleRead(ctx netty.InboundContext, message netty.Me
 	utils.AssertIf(n != len(headerBuffer) || nil != err, "read header fail, headerLength: %d, read: %d, error: %w", len(headerBuffer), n, err)
 
 	// Find the indexes of 0xfa and 0xaf
-	index := l.findIndexes(headerBuffer)
+	index := l.findIndexes(headerBuffer, l.prefixFields)
 
 	// If both indexes are found, discard the bytes before them
 	if index >= 0 {
@@ -143,24 +143,27 @@ func (l *lengthFieldCodec) HandleRead(ctx netty.InboundContext, message netty.Me
 	ctx.HandleRead(frameReader)
 }
 
-func (l *lengthFieldCodec) findIndexes(data []byte) int {
+func (l *lengthFieldCodec) findIndexes(data []byte, prefixFields [][]byte) int {
 	index := -1
-	lengthPrefixField := len(l.prefixField)
 
-	// Slide the window over the data
-	for i := 0; i < len(data)-lengthPrefixField+1; i++ {
-		// Check if the current window matches the pattern
-		matches := true
-		for j := 0; j < lengthPrefixField; j++ {
-			if data[i+j] != l.prefixField[j] {
-				matches = false
-				break
+	for _, prefixField := range prefixFields {
+		lengthPrefixField := len(prefixField)
+
+		// Slide the window over the data
+		for i := 0; i < len(data)-lengthPrefixField+1; i++ {
+			// Check if the current window matches the pattern
+			matches := true
+			for j := 0; j < lengthPrefixField; j++ {
+				if data[i+j] != prefixField[j] {
+					matches = false
+					break
+				}
 			}
-		}
 
-		if matches {
-			index = i
-			break
+			if matches {
+				index = i
+				return index
+			}
 		}
 	}
 	return index
